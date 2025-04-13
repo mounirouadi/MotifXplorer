@@ -1,0 +1,123 @@
+.section-white {
+	background: #fff;
+	padding: 70px 0;
+}
+
+.team-section {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: flex-start;
+	gap: 20px;
+}
+
+.team-item {
+	background: #f4f5f6;
+	text-align: center;
+	padding: 50px 20px 40px 20px;
+	border-radius: 8px;
+	transition: all 0.25s ease-in-out;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.team-item:hover {
+	background: #3956de;
+	color: white;
+}
+
+.team-item h3 {
+	margin: 20px 0 1px 0!important;
+	color: #454545;
+	font-size: 18px;
+	font-weight: 700;
+	text-transform: uppercase;
+	transition: all .25s ease-in-out;
+}
+
+.section-subtitle {
+	white-space: pre-line;
+}
+
+.team-item:hover h3 {
+	color: #ddd;
+}
+
+.team-info {
+	margin-bottom: 0;
+}
+
+.team-info p {
+	color: #acacac;
+	font-style: italic;
+}
+
+.team-info::after {
+	background: #008aff;
+	background: -webkit-linear-gradient(135deg, #6B02FF 0%, #985BEF 100%);
+	background: -o-linear-gradient(bottom right, #6B02FF, #985BEF);
+	background: -moz-linear-gradient(bottom right, #008aff, #1ad2fd);
+	background: linear-gradient(135deg, #6B02FF 0%, #985BEF 100%);
+	display: inline-block;
+	vertical-align: middle;
+	content: "";
+	width: 50px;
+	height: 3px;
+}
+
+.team-img {
+	max-width: 140px;
+	margin: 0 auto;
+	padding: 6px;
+	background-color: #dedede;
+	border-radius: 50%;
+}
+
+ul.team-icon {
+	margin-top: 10px;
+	display: flex;
+	justify-content: center;
+}
+
+ul.team-icon li {
+	margin: 0 3px;
+	transition: all 0.25s ease-in-out;
+}
+
+ul.team-icon li a {
+	display: inline-block;
+	padding: 8px;
+	width: 34px;
+	height: 34px;
+	font-size: 18px;
+	line-height: 18px;
+	background-color: #fff;
+	border-radius: 50%;
+	color: #fff;
+}
+
+ul.team-icon li a.google {
+	background-color: #4099ff;
+}
+
+ul.team-icon li a.github {
+	background-color: #000000;
+}
+
+ul.team-icon li a.facebook {
+	background-color: #3b5998;
+}
+
+ul.team-icon li a.linkedin {
+	background-color: #1952ce;
+}
+
+ul.team-icon li a.dribble {
+	background-color: #ea4c89;
+}
+
+.team-icon li a:hover {
+	color: #dedede;
+	transition: all 0.25s ease-in-out;
+}

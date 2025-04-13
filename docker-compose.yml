@@ -1,0 +1,16 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - CHOKIDAR_USEPOLLING=true  # Optional, can help with file watching on some systems
+
+  backend:
+    build: ./backend
+    # Expose the backend port internally for communication with the frontend
+    ports:
+      - "4000:4000"

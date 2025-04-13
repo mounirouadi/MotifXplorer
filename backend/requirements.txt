@@ -1,0 +1,11 @@
+Flask
+flask-cors
+pyfaidx
+xgboost
+pandas
+numpy
+matplotlib
+graphviz
+seaborn
+scikit-learn
+pickle-mixin

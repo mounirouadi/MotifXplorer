@@ -1,0 +1,95 @@
+@import url("https://fonts.googleapis.com/css?family=Baloo+Paaji|Open+Sans:300,300i,400,400i,600,600i,700,700i");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  text-decoration: none;
+  list-style: none;
+  outline: none;
+  border: none;
+  font-family: 'Open Sans', 'Ubuntu', sans-serif;
+  font-weight: 500;
+  color: var(--white);
+}
+
+:root {
+  --bg-1: #fff;
+  --bg-2: #e7e7e7;
+
+  --primary-1: #ed00db;
+  --primary-1-hover: #d805c6;
+  --primary-1-click: #ce02bd;
+
+  --primary-2: #0576e5;
+  --primary-2-hover: #0465c2;
+  --primary-2-click: #0353a0;
+
+  --success: #5cb85c;
+  --success-hover: #449d44;
+  --success-click: #317b31;
+
+  --danger: #d9534f;
+  --danger-hover: #c9302c;
+  --danger-click: #a94442;
+
+  --dark: #222222;
+
+  --gray-1: #f7f7f7;
+  --gray-2: #d9d9d9;
+  --gray-3: #a6a6a6;
+  --gray-4: #666666;
+  --gray-5: #333333;
+
+  --accent-1: #ffcb00;
+  --accent-2: #ff6b00;
+  --accent-3: #ff004d;
+}
+
+
+body {
+  background-color: var(--bg-1);
+}
+
+/* Bouncing Dots Animation */
+.bouncing-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4F46E5, #7C3AED);
+  animation: bounce 1.4s infinite ease-in-out;
+  transform-origin: center;
+  box-shadow: 0 0 10px rgba(124, 58, 237, 0.3);
+}
+
+.dot-1 {
+  animation-delay: -0.32s;
+}
+
+.dot-2 {
+  animation-delay: -0.16s;
+}
+
+@keyframes bounce {
+  0%, 80%, 100% { 
+    transform: scale(0.6);
+    opacity: 0.6;
+  }
+  40% { 
+    transform: scale(1);
+    opacity: 1;
+  }
+}
