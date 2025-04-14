@@ -112,18 +112,27 @@ def process():
             negative_file = save_base64_file(files_data[1], 'negative.bed', session_dir)
             # Use bedSeqExtractor.py for dual file processing
             print("Processing with both positive and negative files")
-            subprocess.run(['python', bed_seq_extractor, positive_file, negative_file, reference_genome], 
+            try:
+                subprocess.run(['python', bed_seq_extractor, positive_file, negative_file, reference_genome], 
                          cwd=session_dir, check=True)
+            except subprocess.CalledProcessError as e:
+                return jsonify({"error": f"Error processing bed files: {str(e)}"}), 500
         else:
             # Use DualBedSeqExtractor.py for single file processing
             print("Processing with positive file only, generating negative samples")
-            subprocess.run(['python', dual_bed_seq_extractor, positive_file, reference_genome], 
+            try:
+                subprocess.run(['python', dual_bed_seq_extractor, positive_file, reference_genome], 
                          cwd=session_dir, check=True)
+            except subprocess.CalledProcessError as e:
+                return jsonify({"error": f"Error generating negative samples: {str(e)}"}), 500
 
         # Run data_labeling.py
         output_path = os.path.join(session_dir, 'data_final.csv')
-        subprocess.run(['python', data_labeling, f'{positive_file}.new', output_path], 
+        try:
+            subprocess.run(['python', data_labeling, f'{positive_file}.new', output_path], 
                      cwd=session_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({"error": f"Error labeling data: {str(e)}"}), 500
       
         # Create response with the processed data
         with open(output_path, 'rb') as file:
@@ -165,24 +174,30 @@ def kmer():
         model_output = os.path.join(session_dir, 'xgb_model.json')
         
         # Run the XGBoost classifier
-        subprocess.run([
-            'python', xgb_classifier, 
-            '--data', os.path.join(session_dir, 'data_final.csv'),
-            '--kmer', kmer_size,
-            '--model_out', model_output
-        ], cwd=session_dir, check=True)
+        try:
+            subprocess.run([
+                'python', xgb_classifier, 
+                '--data', os.path.join(session_dir, 'data_final.csv'),
+                '--kmer', kmer_size,
+                '--model_out', model_output
+            ], cwd=session_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({"error": f"Error training XGBoost model: {str(e)}"}), 500
         
         # Run the evaluation script to generate confusion matrix and ROC curve
         evaluate_script = os.path.join(BACKEND_DIR, 'evaluate_model.py')
         output_dir = os.path.join(session_dir, 'results')
         os.makedirs(output_dir, exist_ok=True)
         
-        subprocess.run([
-            'python', evaluate_script,
-            '--input', os.path.join(session_dir, 'data_final.csv'),
-            '--kmer_size', kmer_size,
-            '--output_dir', output_dir
-        ], cwd=session_dir, check=True)
+        try:
+            subprocess.run([
+                'python', evaluate_script,
+                '--input', os.path.join(session_dir, 'data_final.csv'),
+                '--kmer_size', kmer_size,
+                '--output_dir', output_dir
+            ], cwd=session_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({"error": f"Error evaluating model: {str(e)}"}), 500
 
         # Rename output files to match what frontend expects
         if os.path.exists(os.path.join(output_dir, 'confusion_matrix.png')):
@@ -236,21 +251,27 @@ def analysis():
         output_dir = os.path.join(session_dir, 'feature_plots')
         os.makedirs(output_dir, exist_ok=True)
         
-        subprocess.run([
-            'python', feature_importance_script,
-            '--input', os.path.join(session_dir, 'data_final.csv'),
-            '--top', features,
-            '--kmer', '6',  # Use default kmer size
-            '--output_dir', output_dir
-        ], cwd=session_dir, check=True)
+        try:
+            subprocess.run([
+                'python', feature_importance_script,
+                '--input', os.path.join(session_dir, 'data_final.csv'),
+                '--top', features,
+                '--kmer', '6',  # Use default kmer size
+                '--output_dir', output_dir
+            ], cwd=session_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({"error": f"Error analyzing feature importance: {str(e)}"}), 500
         
         # Generate importance tree visualization
         importance_tree_script = os.path.join(BACKEND_DIR, 'importance_tree.py')
-        subprocess.run([
-            'python', importance_tree_script,
-            os.path.join(session_dir, 'data_final.csv'),
-            '--kmer_size', '6'  # Use default kmer size
-        ], cwd=session_dir, check=True)
+        try:
+            subprocess.run([
+                'python', importance_tree_script,
+                os.path.join(session_dir, 'data_final.csv'),
+                '--kmer_size', '6'  # Use default kmer size
+            ], cwd=session_dir, check=True)
+        except subprocess.CalledProcessError as e:
+            return jsonify({"error": f"Error generating importance tree: {str(e)}"}), 500
 
         # Copy files to names expected by frontend
         importance_types = ['weight', 'cover', 'gain', 'total_gain', 'total_cover']

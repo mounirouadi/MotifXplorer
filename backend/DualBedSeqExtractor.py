@@ -85,7 +85,7 @@ def write_output(bed_file, positive_regions, negative_regions, reference):
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print("Usage: python DualBedSeqExtractor.py <bed_file> <reference_genome>")
-        sys.exit(1)
+        raise ValueError("Incorrect number of arguments")
 
     bed_file = sys.argv[1]
     reference_genome = sys.argv[2]

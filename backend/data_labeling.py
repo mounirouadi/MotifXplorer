@@ -6,7 +6,7 @@ def create_csv(bed_file, output_csv):
     """Reads a BED file and converts it into a labeled CSV file for ML processing."""
     if not os.path.exists(bed_file):
         print(f"Error: File {bed_file} not found.")
-        sys.exit(1)
+        raise FileNotFoundError(f"BED file not found: {bed_file}")
 
     data = []  # (sequence, label) pairs
 
@@ -30,7 +30,7 @@ def create_csv(bed_file, output_csv):
 
     if not data:
         print("Warning: No valid sequences found in the BED file.")
-        sys.exit(1)
+        raise ValueError("No valid sequences found in the BED file")
 
     with open(output_csv, 'w', newline='') as file:
         writer = csv.writer(file)
@@ -42,7 +42,7 @@ def create_csv(bed_file, output_csv):
 if __name__ == '__main__':
     if len(sys.argv) != 3:
         print("Usage: python data_labeling.py <bed_file> <output_csv>")
-        sys.exit(1)
+        raise ValueError("Incorrect number of arguments")
 
     bed_file = sys.argv[1]
     output_csv = sys.argv[2]
