@@ -11,7 +11,7 @@ function Services() {
                         <div className="col-md-12 text-center">
                             <h2 className="text-2xl text-gray-700 font-semibold text-center mb-3">The Team Behind MotifXplorer</h2>
                             <p className="text-1xl text-gray-700 font-semibold text-center mb-3">{message}</p>
-                        </div> 
+                        </div>
                         <div className="col-sm-6 col-md-4">
                             <div className="team-item">
                                 <img src="images/motoki.jpg" class="team-img" alt="pic" />
@@ -23,7 +23,7 @@ function Services() {
                                     <li><a href="https://scholar.google.com/citations?user=EGtPkLQAAAAJ&hl=en" className="google"><i className="fa fa-google"></i></a></li>
                                 </ul>
                             </div>
-                        </div> 
+                        </div>
                         <div className="col-sm-6 col-md-4">
                             <div className="team-item">
                                 <img src="images/nazim.jpg" className="team-img" alt="pic" />
@@ -41,8 +41,8 @@ function Services() {
                             <div className="team-item">
                                 <img src="images/mounir.jpg" className="team-img" alt="pic" />
                                 <h3>Mounir OUADI</h3>
-                                <div className="team-info"><p>AI-Hardware Acceleration Engineer at Infinite Orbits, AI Research Developer</p></div>
-                                <p>A Computer Engineering fresh graduate, currently working in AI Hardware Acceleration in FPGAs for Space Navigation Satellites, highly interested in integrating AI in biomedical field and in Edge-AI biomedical solutions.</p>
+                                <div className="team-info"><p>Lead AI Engineer at Qareeb | Edge AI & Hardware Acceleration Researcher</p></div>
+                                <p>Embedded Systems & AI Engineer, currently managing AI Department at Qareeb, overseeing computer vision tasks and features, and collaborating in Edge AI, Optimization, and Biomedical Engineering research.</p>
                                 <ul className="team-icon">
                                     <li><a href="https://www.linkedin.com/in/mounir-ouadi/" className="linkedin"><i className="fa fa-linkedin"></i></a></li>
                                     <li><a href="https://github.com/mounirouadi" className="github"><i className="fa fa-github"></i></a></li>
