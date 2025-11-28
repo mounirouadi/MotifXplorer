@@ -162,7 +162,10 @@ docker compose logs [service-name]
 ```
 
 ### Can't Access from Outside
-- Verify port 3000 is open on server firewall
+- **FIREWALL**: Verify port 3000 is open on server firewall.
+  ```bash
+  sudo ufw allow 3000/tcp
+  ```
 - Check hosting provider routes domain to port 3000
 
 ### Mixed Content Errors
