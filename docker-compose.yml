@@ -9,7 +9,6 @@ services:
     depends_on:
       - frontend
       - backend
-    restart: unless-stopped
 
   frontend:
     build: ./frontend
