@@ -20,25 +20,6 @@
 
 ## Deployment Steps
 
-### 1. Push Code to Repository
-
-```bash
-cd /home/mounir/Desktop/sort/research/MotifXplorer
-
-# Check what will be committed
-git status
-
-# Add all changes
-git add .
-
-# Commit with message
-git commit -m "Production ready: Added reverse proxy, navigation fixes, and type filtering"
-
-# Push to remote
-git push origin main
-```
-
-### 2. On Production Server (134.129.255.146)
 
 ```bash
 # Clone repository
