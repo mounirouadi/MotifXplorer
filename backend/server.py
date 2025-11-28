@@ -236,7 +236,14 @@ def analysis():
     try:
         session_dir = request.form.get('session_dir')
         features = request.form.get('features', '10')  # Default to 10 if not provided
-        types = request.form.get('types', ['weight', 'gain', 'cover', 'total_gain', 'total_cover'])
+        types_str = request.form.get('types', '["weight", "gain", "cover", "total_gain", "total_cover"]')
+        
+        # Parse types from JSON string
+        import json
+        try:
+            types = json.loads(types_str)
+        except:
+            types = ['weight', 'gain', 'cover', 'total_gain', 'total_cover']
         
         if not session_dir or not os.path.exists(session_dir):
             return jsonify({"error": "Session directory not found"}), 400
@@ -244,7 +251,7 @@ def analysis():
         # Update last access time
         active_sessions[session_dir] = time.time()
         
-        print(f"Generating Post Analysis Report with top {features} features")
+        print(f"Generating Post Analysis Report with top {features} features for types: {types}")
         
         # Run feature importance analysis
         feature_importance_script = os.path.join(BACKEND_DIR, 'feature_importance.py')
@@ -273,43 +280,48 @@ def analysis():
         except subprocess.CalledProcessError as e:
             return jsonify({"error": f"Error generating importance tree: {str(e)}"}), 500
 
-        # Copy files to names expected by frontend
-        importance_types = ['weight', 'cover', 'gain', 'total_gain', 'total_cover']
-        for imp_type in importance_types:
+        # Copy only the requested importance type files
+        for imp_type in types:
             src = os.path.join(output_dir, f'top_{features}_{imp_type}_importance.png')
             dst = os.path.join(session_dir, f'top_10_feature_{imp_type}_importance.png')
             if os.path.exists(src):
                 shutil.copy(src, dst)
 
-        # Read all generated images
+        # Read only the selected importance type images
         images = {}
-        image_files = [
-            'top_10_feature_cover_importance.png',
-            'top_10_feature_gain_importance.png',
-            'top_10_feature_total_cover_importance.png',
-            'top_10_feature_total_gain_importance.png',
-            'top_10_feature_weight_importance.png',
-            'importance_tree.png'
-        ]
+        type_to_filename = {
+            'cover': 'top_10_feature_cover_importance.png',
+            'gain': 'top_10_feature_gain_importance.png',
+            'total_cover': 'top_10_feature_total_cover_importance.png',
+            'total_gain': 'top_10_feature_total_gain_importance.png',
+            'weight': 'top_10_feature_weight_importance.png'
+        }
         
-        for img_file in image_files:
-            try:
-                with open(os.path.join(session_dir, img_file), 'rb') as file:
-                    images[img_file] = base64.b64encode(file.read()).decode('utf-8')
-            except FileNotFoundError:
-                print(f"Warning: File {img_file} not found in session directory")
-                continue
+        # Build response with only selected types
+        response_data = {}
+        image_counter = 1
+        
+        for imp_type in types:
+            if imp_type in type_to_filename:
+                img_file = type_to_filename[imp_type]
+                try:
+                    with open(os.path.join(session_dir, img_file), 'rb') as file:
+                        img_data = base64.b64encode(file.read()).decode('utf-8')
+                        response_data[f"image{image_counter}"] = f"data:image/png;base64,{img_data}"
+                        image_counter += 1
+                except FileNotFoundError:
+                    print(f"Warning: File {img_file} not found in session directory")
+                    continue
+        
+        # Always include the tree
+        try:
+            with open(os.path.join(session_dir, 'importance_tree.png'), 'rb') as file:
+                tree_data = base64.b64encode(file.read()).decode('utf-8')
+                response_data["tree"] = f"data:image/png;base64,{tree_data}"
+        except FileNotFoundError:
+            print("Warning: importance_tree.png not found")
 
-        response = jsonify({
-            "image1": "data:image/png;base64," + images.get('top_10_feature_cover_importance.png', ''),
-            "image2": "data:image/png;base64," + images.get('top_10_feature_gain_importance.png', ''),
-            "image3": "data:image/png;base64," + images.get('top_10_feature_total_cover_importance.png', ''),
-            "image4": "data:image/png;base64," + images.get('top_10_feature_total_gain_importance.png', ''),
-            "image5": "data:image/png;base64," + images.get('top_10_feature_weight_importance.png', ''),
-            "tree": "data:image/png;base64," + images.get('importance_tree.png', '')
-        })
-        
-        return response
+        return jsonify(response_data)
         
     except Exception as e:
         return jsonify({"error": str(e)}), 500

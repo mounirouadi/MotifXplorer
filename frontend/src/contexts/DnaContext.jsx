@@ -11,6 +11,7 @@ export const DnaContextProvider = ({ children }) => {
   const [kmer, setKmer] = useState(null);
   const [csv, setCsv] = useState(null);
   const [images, setImages] = useState({});
+  const [rocImages, setRocImages] = useState({});
   const [tree, setTree] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -55,6 +56,8 @@ export const DnaContextProvider = ({ children }) => {
         setCsv,
         images,
         setImages,
+        rocImages,
+        setRocImages,
       }}
     >
       {children}

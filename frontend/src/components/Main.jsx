@@ -7,6 +7,7 @@ import { toast } from "react-hot-toast";
 import FirstPanel from "./ControlPanels/firstPanel/FirstPanel";
 import SecondPanel from "./ControlPanels/secondPanel/SecondPanel";
 import ThirdPanel from "./ControlPanels/ThirdPanel";
+import RocPanel from "./ControlPanels/RocPanel";
 import Select from "react-select";
 import Modal from "react-modal";
 import BouncingDots from "./DnaLoader";
@@ -55,6 +56,10 @@ const Main = () => {
     setCsv,
     kmer,
     setImages,
+    csv,
+    images,
+    rocImages,
+    setRocImages,
   } = useDnaContext();
   const [panelNumber, setPanelNumber] = useState(0);
   const [modalIsOpen, setIsOpen] = useState(false);
@@ -113,10 +118,10 @@ const Main = () => {
       return toast.error("Please select a reference genome");
     if (!uploadedFiles || !uploadedFiles.length)
       return toast.error("Please upload a file");
-    
+
     setLoading(true);
     setProcessing(true);
-    
+
     try {
       if (panelNumber == 0) {
         const formData = new FormData();
@@ -126,7 +131,7 @@ const Main = () => {
         formData.append("bedFile", bedFile);
         formData.append("referenceGenome", referenceGenome);
         const { data } = await axios.post(
-          "http://localhost:4000/process",
+          "/api/process",
           formData,
           {
             headers: {
@@ -140,13 +145,13 @@ const Main = () => {
         const formData = new FormData();
         formData.append("kmer", kmer);
         formData.append("session_dir", sessionDir);
-        const { data } = await axios.post("http://localhost:4000/kmer", 
+        const { data } = await axios.post("/api/kmer",
           formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         });
-        setImages(data);
+        setRocImages(data);
       }
 
       setPanelNumber((oldState) => {
@@ -168,16 +173,17 @@ const Main = () => {
     setLoading(true);
     const formData = new FormData();
     formData.append("features", features);
-    formData.append("types", types);
+    formData.append("types", JSON.stringify(types));
     formData.append("session_dir", sessionDir);
-    const { data } = await axios.post("http://localhost:4000/analysis", 
-    formData, {
+    const { data } = await axios.post("/api/analysis",
+      formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
-  });
+    });
     setImages(data);
     setGeneratedDetails(true);
+    setPanelNumber(3);
     setLoading(false);
     closeModal();
   };
@@ -193,19 +199,27 @@ const Main = () => {
           <>
             <div className="flex justify-between items-center w-[96%] px-1 mt-[5px]">
               <h1 className="text-3xl text-gray-700 font-semibold text-center mb-3">
-                {generatedDetails
-                  ? "Post Training Report"
-                  : "ROC & Confusion Matrix"}
+                ROC & Confusion Matrix
               </h1>
-              {!generatedDetails && (
-                <button
-                  onClick={openModal}
-                  className="px-6 py-2 text-white rounded-md capitalize leading-[2.2] duration-300 hover:scale-95"
-                  style={backgroundGardient}
-                >
-                  Generate Post Training Report
-                </button>
-              )}
+              <button
+                onClick={openModal}
+                className="px-6 py-2 text-white rounded-md capitalize leading-[2.2] duration-300 hover:scale-95"
+                style={backgroundGardient}
+              >
+                Generate Post Training Report
+              </button>
+            </div>
+            <div className="h-[1px] w-[96%] mt-4 bg-gray-300" />
+          </>
+        );
+      }
+      case 3: {
+        return (
+          <>
+            <div className="flex justify-between items-center w-[96%] px-1 mt-[5px]">
+              <h1 className="text-3xl text-gray-700 font-semibold text-center mb-3">
+                Post Training Report
+              </h1>
             </div>
             <div className="h-[1px] w-[96%] mt-4 bg-gray-300" />
           </>
@@ -236,14 +250,53 @@ const Main = () => {
       case 1:
         return <SecondPanel handleProcess={handleProcess} />;
       case 2:
+        return <RocPanel />;
+      case 3:
         return <ThirdPanel />;
       default:
         <FirstPanel handleProcess={handleProcess} />;
     }
   };
 
+  const handleBack = () => {
+    setPanelNumber((prev) => Math.max(0, prev - 1));
+  };
+
+  const handleNext = () => {
+    setPanelNumber((prev) => Math.min(3, prev + 1));
+  };
+
+  const canGoNext = () => {
+    if (panelNumber === 0 && csv) return true;
+    if (panelNumber === 1 && rocImages && Object.keys(rocImages).length > 0) return true;
+    if (panelNumber === 2 && images && Object.keys(images).length > 0) return true;
+    return false;
+  };
+
   return (
     <>
+      <div className="w-full flex justify-between px-4 mt-4">
+        <div>
+          {panelNumber > 0 && (
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold transition-colors"
+            >
+              <i className="fas fa-arrow-left"></i> Back
+            </button>
+          )}
+        </div>
+        <div>
+          {canGoNext() && (
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 font-semibold transition-colors"
+            >
+              Next <i className="fas fa-arrow-right"></i>
+            </button>
+          )}
+        </div>
+      </div>
       {<PageHeader />}
       <div
         className="flex flex-row w-full justify-center flex-wrap items-center gap-10 px-2"
@@ -320,9 +373,8 @@ const Main = () => {
         <div className="flex justify-start items-center w-full mt-6">
           <button
             onClick={handleDetails}
-            className={`px-6 py-2 text-white rounded-md capitalize leading-[1.8] duration-300 hover:scale-95 ${
-              loading ? "opacity-50 cursor-not-allowed" : ""
-            } ${generatedDetails ? "bg-green-500" : "bg-primary-1"}}`}
+            className={`px-6 py-2 text-white rounded-md capitalize leading-[1.8] duration-300 hover:scale-95 ${loading ? "opacity-50 cursor-not-allowed" : ""
+              } ${generatedDetails ? "bg-green-500" : "bg-primary-1"}}`}
             style={backgroundGardient}
           >
             {loading ? <i className="fas fa-spinner fa-spin"></i> : "Generate"}
