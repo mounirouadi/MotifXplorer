@@ -14,7 +14,7 @@ services:
   frontend:
     build: ./frontend
     expose:
-      - "3001"
+      - "80"
     depends_on:
       - backend
 
