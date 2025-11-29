@@ -1,22 +1,22 @@
-# Build stage
-FROM node:18-buster-slim as build
+# Use a Node base image
+FROM node:18-buster-slim
 
+# Set working directory
 WORKDIR /app
+
+# Copy package files and install dependencies
 COPY package*.json ./
 RUN npm install
+
+# Copy the rest of the source code
 COPY . .
-RUN npm run build
 
-# Production stage - use nginx to serve static files
-FROM nginx:alpine
+# Ensure the app binds to 0.0.0.0 for external access
+ENV HOST=0.0.0.0
+ENV WDS_SOCKET_PORT=0
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Expose the React development server port
+EXPOSE 3000
 
-# Copy the build output to nginx html directory
-COPY --from=build /app/build /usr/share/nginx/html
-
-# Expose port 80
-EXPOSE 80
-
-# nginx will start automatically with the default command
+# Run the React development server
+CMD ["npm", "start"]
