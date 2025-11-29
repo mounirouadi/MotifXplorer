@@ -11,12 +11,14 @@ RUN npm install
 # Copy the rest of the source code
 COPY . .
 
-# Ensure the app binds to 0.0.0.0 for external access
-ENV HOST=0.0.0.0
-ENV WDS_SOCKET_PORT=0
+# Build the React application for production
+RUN npm run build
 
-# Expose the React development server port
-EXPOSE 3000
+# Install 'serve' to serve the static build
+RUN npm install -g serve
 
-# Run the React development server
-CMD ["npm", "start"]
+# Expose port 3001
+EXPOSE 3001
+
+# Serve the production build on port 3001
+CMD ["serve", "-s", "build", "-l", "3001"]
