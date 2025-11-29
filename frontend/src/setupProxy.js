@@ -8,9 +8,7 @@ module.exports = function (app) {
             changeOrigin: true,
             logLevel: 'debug',
             pathRewrite: {
-                // If the backend expects /api prefix, keep it. 
-                // If the backend routes are just /process, /kmer, etc., we might need to rewrite.
-                // Based on previous code, the backend has @app.route('/api/process'), so NO rewrite needed.
+                '^/api': '', // Rewrite /api/process -> /process
             },
             onProxyReq: (proxyReq, req, res) => {
                 // Log proxy requests for debugging
