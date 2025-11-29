@@ -20,5 +20,5 @@ RUN npm install -g serve
 # Expose port 3001
 EXPOSE 3001
 
-# Serve the production build on port 3001
-CMD ["serve", "-s", "build", "-l", "3001"]
+# Serve the production build on port 3001, binding to all interfaces
+CMD ["serve", "-s", "build", "-l", "tcp://0.0.0.0:3001"]
